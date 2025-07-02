@@ -22,7 +22,7 @@ class _PengumumanState extends State<Pengumuman> {
 
   Future<void> fetchPengumuman() async {
     try {
-      final url = Uri.parse('http://192.168.1.46:8000/api/pengumuman');
+      final url = Uri.parse('http://192.168.131.140:8000/api/pengumuman');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

@@ -1,93 +1,166 @@
-import 'package:aplikasi_dosen/materi%20kuliah/daftarmateri.dart';
+import 'dart:convert';
+import 'package:aplikasi_dosen/materi%20kuliah/input_nilai_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Materikuliah extends StatelessWidget {
-  const Materikuliah({super.key});
+class MatkulListPage extends StatefulWidget {
+  const MatkulListPage({super.key});
+
+  @override
+  State<MatkulListPage> createState() => _MatkulListPageState();
+}
+
+class _MatkulListPageState extends State<MatkulListPage> {
+  List<dynamic> matkulList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMatkul();
+  }
+
+  Future<void> fetchMatkul() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('http://192.168.131.140:8000/api/input-nilai/matkul'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        matkulList = json.decode(response.body);
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print('Gagal mengambil data: ${response.body}');
+    }
+  }
+
+  void gotoMahasiswaPage(int jadwalKuliahId, int mataKuliahId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MahasiswaNilaiPage(
+          jadwalKuliahId: jadwalKuliahId,
+          mataKuliahId: mataKuliahId,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(130),
-          child: ClipRRect(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
-            child: AppBar(
-              backgroundColor: Color(0xFF00712D),
-              flexibleSpace: Padding(
-                padding: EdgeInsets.only(top: 60),
-                child: Column(
-                  children: [
-                    Text(
-                      "Materi Kuliah",
-                      style: TextStyle(
-                          fontFamily: 'PoppinsBold',
-                          fontSize: 25,
-                          color: Color(0xFFFFFFFF)),
-                    ),
-                    Text(
-                      "Universitas Malikussaleh",
-                      style: TextStyle(
-                          fontFamily: 'PoppinsRegular',
-                          fontSize: 14,
-                          color: Color(0xFFFFFFFF)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )),
-      body: ListView(
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
-              child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.red,
-                  ),
-                  label: Text(
-                    "Kembali",
-                    style: TextStyle(color: Colors.red, fontSize: 16),
-                  )),
-            ),
+      appBar: AppBar(
+        title: const Text(
+          'Daftar Mata Kuliah',
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: 'PoppinsMedium',
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30),
-            child: Column(
-              children: [
-                Container(
-                  width: 320,
-                  height: 2,
-                  color: Color(0xFFFF9100),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
-                    "Semester",
-                    style: TextStyle(
-                        fontFamily: 'PoppinsBold',
-                        fontSize: 12,
-                        color: Colors.black),
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Container(
-                  width: 320,
-                  height: 2,
-                  color: Color(0xFFFF9100),
-                )
-              ],
-            ),
-          ),
-          Daftarmateri(),
-        ],
+        ),
+        backgroundColor: const Color(0xFF00712D),
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
       ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : matkulList.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Tidak ada data mata kuliah.',
+                    style: TextStyle(fontFamily: 'PoppinsRegular'),
+                  ),
+                )
+              : ListView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  itemCount: matkulList.length,
+                  itemBuilder: (context, index) {
+                    final jadwal = matkulList[index];
+                    final kelas = jadwal['kelas'];
+                    final matkul = kelas['mata_kuliah'];
+
+                    return GestureDetector(
+                      onTap: () => gotoMahasiswaPage(
+                        jadwal['id'],
+                        matkul['id'],
+                      ),
+                      child: Card(
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                matkul['nama_matkul'] ?? '-',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'PoppinsMedium',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Icon(Icons.class_,
+                                      size: 18, color: Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Kelas: ${kelas['nama_kelas']}',
+                                    style: const TextStyle(
+                                        fontFamily: 'PoppinsRegular'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.calendar_today,
+                                      size: 18, color: Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '${jadwal['hari']} • ${jadwal['jam_mulai']} - ${jadwal['jam_selesai']}',
+                                    style: const TextStyle(
+                                        fontFamily: 'PoppinsRegular'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.meeting_room,
+                                      size: 18, color: Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Ruangan: ${jadwal['ruangan']}',
+                                    style: const TextStyle(
+                                        fontFamily: 'PoppinsRegular'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

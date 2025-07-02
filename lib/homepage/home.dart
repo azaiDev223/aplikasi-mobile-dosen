@@ -1,3 +1,5 @@
+import 'package:aplikasi_dosen/akun/infoakun.dart';
+import 'package:aplikasi_dosen/pesan/dosen_conversation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:aplikasi_dosen/homepage/menudosen.dart';
@@ -14,6 +16,7 @@ class _homepageState extends State<homepage> {
   String nama = '';
   String nip = '';
   String fotoUrl = '';
+  int _selectedIndex = 1; // index tengah untuk homepage
 
   @override
   void initState() {
@@ -32,6 +35,29 @@ class _homepageState extends State<homepage> {
     print('Nama: $nama');
     print('NIP: $nip');
     print('Foto URL: $fotoUrl');
+  }
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex)
+      return; // Jangan lakukan apapun jika sedang di tab itu
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const DosenConversationPage()),
+        );
+        break;
+      case 1:
+        // Homepage (tidak perlu berpindah)
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const infoakun()),
+        );
+        break;
+    }
   }
 
   @override
@@ -161,6 +187,59 @@ class _homepageState extends State<homepage> {
           ),
           const Pengumuman(),
         ],
+      ),
+      bottomNavigationBar: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        child: Container(
+          height: 70, // Ubah tinggi sesuai kebutuhan
+          decoration: const BoxDecoration(
+            color: Color(0xFF00712D), // Hijau
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.transparent, // biar ikut Container
+            elevation: 0,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white70,
+            currentIndex: _selectedIndex,
+            onTap: (int index) {
+              switch (index) {
+                case 0:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DosenConversationPage()),
+                  );
+                  break;
+                case 1:
+                  // Sudah di homepage
+                  break;
+                case 2:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const infoakun()),
+                  );
+                  break;
+              }
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.message),
+                label: 'Pesan',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Beranda',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profil',
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

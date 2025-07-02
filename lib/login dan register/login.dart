@@ -23,7 +23,7 @@ class _LoginTwoState extends State<LoginTwo> {
     setState(() => isLoading = true);
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.46:8000/api/login-dosen'),
+        Uri.parse('http://192.168.131.140:8000/api/login-dosen'),
         headers: {'Accept': 'application/json'},
         body: {
           'email': cUser.text.trim(),
@@ -39,9 +39,16 @@ class _LoginTwoState extends State<LoginTwo> {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token ?? '');
-        await prefs.setString('nama', dosen['nama']?.toString() ?? '');
-        await prefs.setString('nip', dosen['nip']?.toString() ?? '');
-        await prefs.setString('foto_url', dosen['foto_url']?.toString() ?? '');
+        await prefs.setString('id', dosen['id']?.toString() ?? '');
+        await prefs.setString('nama', dosen['nama'] ?? '');
+        await prefs.setString('nip', dosen['nip'] ?? '');
+        await prefs.setString('email', dosen['email'] ?? '');
+        await prefs.setString('foto_url', dosen['foto_url'] ?? '');
+        await prefs.setString('jenis_kelamin', dosen['jenis_kelamin'] ?? '');
+        await prefs.setString('no_hp', dosen['no_hp'] ?? '');
+        await prefs.setString('tanggal_lahir', dosen['tanggal_lahir'] ?? '');
+        await prefs.setString(
+            'program_studi', dosen['program_studi']?.toString() ?? '');
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login berhasil')),

@@ -1,5 +1,5 @@
 import 'package:aplikasi_dosen/bimbingan/menu_bimbingan.dart';
-import 'package:aplikasi_dosen/jadwal_masuk/menu_jadwal.dart';
+import 'package:aplikasi_dosen/jadwal_masuk/hari.dart';
 import 'package:aplikasi_dosen/materi%20kuliah/materi.dart';
 import 'package:flutter/material.dart';
 
@@ -10,13 +10,13 @@ class Menudosen extends StatelessWidget {
     {
       'image': 'asset/image/Vector.png',
       'title': 'Jadwal Mengajar',
-      'page': jadwalmasuk(),
+      'page': hari(),
       'color': Color(0xFF00712D),
     },
     {
       'image': 'asset/image/School.png',
-      'title': 'Materi Kuliah',
-      'page': Materikuliah(),
+      'title': 'Input Nilai',
+      'page': MatkulListPage(),
       'color': Color(0xFFFF9100),
     },
     // {

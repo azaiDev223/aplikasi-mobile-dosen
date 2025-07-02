@@ -1,55 +1,80 @@
 import 'package:aplikasi_dosen/akun/editakun.dart';
-import 'package:aplikasi_dosen/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+class Datadiri extends StatefulWidget {
+  const Datadiri({super.key});
 
-class datadiri extends StatelessWidget {
+  @override
+  State<Datadiri> createState() => _DatadiriState();
+}
+
+class _DatadiriState extends State<Datadiri> {
+  String nama = '';
+  String nip = '';
+  String email = '';
+  String jenisKelamin = '';
+  String tanggalLahir = '';
+  String noHp = '';
+  String programStudi = '';
+
+  @override
+  void initState() {
+    super.initState();
+    loadDataDosen();
+  }
+
+  Future<void> loadDataDosen() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nama = prefs.getString('nama') ?? '';
+      nip = prefs.getString('nip') ?? '';
+      email = prefs.getString('email') ?? '';
+      jenisKelamin = prefs.getString('jenis_kelamin') ?? '';
+      tanggalLahir = prefs.getString('tanggal_lahir') ?? '';
+      noHp = prefs.getString('no_hp') ?? '';
+      programStudi = prefs.getString('program_studi') ?? 'Tidak ditemukan';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserModel>(context);
-
     return Scaffold(
-      backgroundColor: Color(0xffD9D9D9),
+      backgroundColor: const Color(0xffD9D9D9),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(130),
+        preferredSize: const Size.fromHeight(130),
         child: ClipRRect(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(15)),
           child: AppBar(
-            backgroundColor: Color(0xFF00712D),
-            flexibleSpace: Padding(
+            backgroundColor: const Color(0xFF00712D),
+            flexibleSpace: const Padding(
               padding: EdgeInsets.only(top: 60),
               child: Column(
                 children: [
                   Text(
                     "Informasi Akun",
                     style: TextStyle(
-                      fontFamily: 'PoppinsBold',
-                      fontSize: 25,
-                      color: Colors.white,
-                    ),
+                        fontFamily: 'PoppinsBold',
+                        fontSize: 25,
+                        color: Colors.white),
                   ),
                   Text(
                     "Universitas Malikussaleh",
                     style: TextStyle(
-                      fontFamily: 'PoppinsRegular',
-                      fontSize: 14,
-                      color: Colors.white,
-                    ),
+                        fontFamily: 'PoppinsRegular',
+                        fontSize: 14,
+                        color: Colors.white),
                   ),
                 ],
               ),
             ),
             leading: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.red,
-                    size: 20,
-                  ),
-                ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back, color: Colors.red),
+            ),
           ),
         ),
       ),
@@ -61,90 +86,85 @@ class datadiri extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInfoField("Nama", user.name),
-                  _buildInfoField("NIM", user.nim),
-                  _buildInfoField("Fakultas", user.fakultas),
-                  _buildInfoField("Prodi", user.prodi),
-                  _buildInfoField("Tempat Lahir", user.tempatLahir),
-                  _buildInfoField("Tanggal Lahir", user.tanggalLahir),
-                  _buildInfoField("Alamat", user.alamat),
+                  _buildInfoField("Nama", nama),
+                  _buildInfoField("NIP", nip),
+                  _buildInfoField("Email", email),
+                  _buildInfoField("Program Studi", programStudi),
+                  _buildInfoField("Jenis Kelamin", jenisKelamin),
+                  _buildInfoField("Tanggal Lahir", tanggalLahir),
+                  _buildInfoField("No HP", noHp),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 5),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => EditAkun()),
+                    MaterialPageRoute(builder: (_) => EditAkun()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xff1400FF),
+                  backgroundColor: const Color(0xff1400FF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  minimumSize: Size(double.infinity, 65),
+                  minimumSize: const Size(double.infinity, 45),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
-                    "Edit Data",
+                    "Edit Data Diri",
                     style: TextStyle(
                       fontFamily: 'Poppinsmedium',
                       fontSize: 14,
-                      color: Color(0xFFFFFFFF),
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
             ),
+            SizedBox(
+              height: 10,
+            )
           ],
         ),
       ),
     );
   }
 
-  // Helper widget untuk menampilkan data dengan gaya serupa input field
   Widget _buildInfoField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Poppinsmedium',
-              fontSize: 16,
-            ),
-          ),
-          SizedBox(height: 5),
+          Text(label,
+              style:
+                  const TextStyle(fontFamily: 'Poppinsmedium', fontSize: 16)),
+          const SizedBox(height: 5),
           Container(
             width: double.infinity,
             height: 45,
             decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.3),
-                  spreadRadius: 0,
                   blurRadius: 4,
-                  offset: Offset(2, 2),
+                  offset: const Offset(2, 2),
                 ),
               ],
-              color: Colors.white,
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              child: Text(
-                value,
-                style: TextStyle(
-                  fontFamily: 'Poppinssemibold',
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Poppinssemibold',
+                fontSize: 16,
+                color: Colors.black,
               ),
             ),
           ),

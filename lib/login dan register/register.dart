@@ -35,7 +35,7 @@ class _RegisterState extends State<Register> {
 
   Future<void> fetchProdi() async {
     final res = await http.get(
-      Uri.parse('http://192.168.1.46:8000/api/prodi'),
+      Uri.parse('http://192.168.131.140:8000/api/prodi'),
       headers: {'Accept': 'application/json'},
     );
     if (res.statusCode == 200) {
@@ -61,7 +61,7 @@ class _RegisterState extends State<Register> {
     setState(() => errorMsg = '');
 
     try {
-      var uri = Uri.parse('http://192.168.1.46:8000/api/dosen');
+      var uri = Uri.parse('http://192.168.131.140:8000/api/dosen');
       var request = http.MultipartRequest('POST', uri);
 
       request.fields['nip'] = cNip.text.trim();
@@ -119,85 +119,152 @@ class _RegisterState extends State<Register> {
   }
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Register Dosen")),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: Stack(
         children: [
-          if (errorMsg.isNotEmpty)
-            Text(errorMsg, style: const TextStyle(color: Colors.red)),
-          Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: pickImage,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: _selectedImage != null
-                        ? FileImage(_selectedImage!)
-                        : null,
-                    child: _selectedImage == null
-                        ? const Icon(Icons.camera_alt, size: 40)
-                        : null,
+          Container(
+            color: const Color(0xFF00712D),
+            height: double.infinity,
+            width: double.infinity,
+            child: const Padding(
+              padding: EdgeInsets.only(top: 30),
+              child: Column(
+                children: [
+                  Image(
+                    image: AssetImage('asset/image/logo1.png'),
+                    width: 59,
+                    height: 77,
                   ),
-                ),
-                const SizedBox(height: 10),
-                const Text("Klik gambar untuk pilih foto"),
-                buildInput('NIP', cNip),
-                buildInput('Nama', cNama),
-                buildInput('Email', cEmail),
-                buildInput('Password', cPass, pass: true),
-                buildInput('Konfirmasi Password', cConfirmPass, pass: true),
-                buildInput('No HP', cHp),
-                buildInput('Tanggal Lahir (YYYY-MM-DD)', cTgl),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Jenis Kelamin',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                        value: 'Laki-laki', child: Text('Laki-laki')),
-                    DropdownMenuItem(
-                        value: 'Perempuan', child: Text('Perempuan')),
-                  ],
-                  onChanged: (v) => setState(() => selectedGender = v),
-                  validator: (v) => v == null ? 'Pilih jenis kelamin' : null,
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<int>(
-                  decoration: const InputDecoration(
-                    labelText: 'Program Studi',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: prodiList
-                      .map<DropdownMenuItem<int>>((p) => DropdownMenuItem<int>(
-                            value: p['id'],
-                            child: Text(p['nama_prodi']),
-                          ))
-                      .toList(),
-                  value: selectedProdi,
-                  onChanged: (v) => setState(() => selectedProdi = v),
-                  validator: (v) => v == null ? 'Pilih Program Studi' : null,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: registerDosen,
-                  child: const Text('Register'),
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50)),
-                ),
-                const SizedBox(height: 10),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Kembali ke Login'),
-                ),
-              ],
+                  Text(
+                    'Sistem Akademik',
+                    style: TextStyle(
+                      fontFamily: 'PoppinsEkstraBold',
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 150),
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xffFFFBE6),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Register',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'PoppinsEkstraBold',
+                      color: Color(0xFF00712D),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: pickImage,
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.grey[300],
+                            backgroundImage: _selectedImage != null
+                                ? FileImage(_selectedImage!)
+                                : null,
+                            child: _selectedImage == null
+                                ? const Icon(Icons.camera_alt, size: 40)
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text("Klik gambar untuk pilih foto"),
+                        if (errorMsg.isNotEmpty)
+                          Text(errorMsg,
+                              style: const TextStyle(color: Colors.red)),
+                        buildInput('NIP', cNip),
+                        buildInput('Nama', cNama),
+                        buildInput('Email', cEmail),
+                        buildInput('Password', cPass, pass: true),
+                        buildInput('Konfirmasi Password', cConfirmPass,
+                            pass: true),
+                        buildInput('No HP', cHp),
+                        buildInput('Tanggal Lahir (YYYY-MM-DD)', cTgl),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Jenis Kelamin',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                                value: 'Laki-laki', child: Text('Laki-laki')),
+                            DropdownMenuItem(
+                                value: 'Perempuan', child: Text('Perempuan')),
+                          ],
+                          onChanged: (v) => setState(() => selectedGender = v),
+                          validator: (v) =>
+                              v == null ? 'Pilih jenis kelamin' : null,
+                        ),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<int>(
+                          decoration: const InputDecoration(
+                            labelText: 'Program Studi',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: prodiList
+                              .map<DropdownMenuItem<int>>(
+                                  (p) => DropdownMenuItem<int>(
+                                        value: p['id'],
+                                        child: Text(p['nama_prodi']),
+                                      ))
+                              .toList(),
+                          value: selectedProdi,
+                          onChanged: (v) => setState(() => selectedProdi = v),
+                          validator: (v) =>
+                              v == null ? 'Pilih Program Studi' : null,
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: registerDosen,
+                          child: const Text('Register'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF9100),
+                            minimumSize: const Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            'Kembali ke Login',
+                            style: TextStyle(fontFamily: 'PoppinsMedium'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );

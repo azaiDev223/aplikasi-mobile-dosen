@@ -1,140 +1,142 @@
-import 'package:aplikasi_dosen/bimbingan/detailskripsi.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
-class MahasiswaBimbingan extends StatelessWidget {
-  final List<Map<String, String>> mahasiswaList = [
-    {
-      'nama': 'RoBet',
-      'nim': '230180078',
-      'prodi': 'Sistem Informasi',
-      'semester': '8',
-      'dosen': 'Pak Dosen. M.Kom',
-      'judul': 'Sistem Informasi Manajemen',
-      'bimbingan': 'Bimbingan Pertama',
-      'isi': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-    },
-    {
-      'nama': 'Beti',
-      'nim': '230180074',
-      'prodi': 'Sistem Informasi',
-      'semester': '8',
-      'dosen': 'Pak Dosen. M.Kom',
-      'judul': 'Analisis Data Big Data',
-      'bimbingan': 'Bimbingan Kedua',
-      'isi': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-    },
-  ];
+class MahasiswaBimbingan extends StatefulWidget {
+  const MahasiswaBimbingan({super.key});
+
+  @override
+  State<MahasiswaBimbingan> createState() => _MahasiswaBimbinganState();
+}
+
+class _MahasiswaBimbinganState extends State<MahasiswaBimbingan> {
+  List<dynamic> bimbinganList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBimbingan();
+  }
+
+  Future<void> fetchBimbingan() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('http://192.168.131.140:8000/api/bimbingan-dosen'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        bimbinganList = data['data'];
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      debugPrint('Gagal mengambil data bimbingan');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(130),
-          child: ClipRRect(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
-            child: AppBar(
-              backgroundColor: Color(0xFF00712D),
-              flexibleSpace: Padding(
-                padding: EdgeInsets.only(top: 60),
-                child: Column(
-                  children: [
-                    Text(
-                      "Jadwal Kuliah",
-                      style: TextStyle(
-                          fontFamily: 'PoppinsBold',
-                          fontSize: 25,
-                          color: Color(0xFFFFFFFF)),
-                    ),
-                    Text(
-                      "Universitas Malikussaleh",
-                      style: TextStyle(
-                          fontFamily: 'PoppinsRegular',
-                          fontSize: 14,
-                          color: Color(0xFFFFFFFF)),
-                    ),
-                  ],
-                ),
+        preferredSize: const Size.fromHeight(130),
+        child: ClipRRect(
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(15)),
+          child: AppBar(
+            backgroundColor: const Color(0xFF00712D),
+            flexibleSpace: Padding(
+              padding: const EdgeInsets.only(top: 60),
+              child: Column(
+                children: const [
+                  Text(
+                    "Bimbingan Mahasiswa",
+                    style: TextStyle(
+                        fontFamily: 'PoppinsBold',
+                        fontSize: 25,
+                        color: Colors.white),
+                  ),
+                  Text(
+                    "Universitas Malikussaleh",
+                    style: TextStyle(
+                        fontFamily: 'PoppinsRegular',
+                        fontSize: 14,
+                        color: Colors.white),
+                  ),
+                ],
               ),
             ),
-          )),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back, color: Colors.red),
-                label: Text(
-                  "Kembali",
-                  style: TextStyle(color: Colors.red, fontSize: 16),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: mahasiswaList.length,
-                itemBuilder: (context, index) {
-                  var mahasiswa = mahasiswaList[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DetailSkripsiPage(mahasiswa: mahasiswa),
-                        ),
-                      );
-                    },
-                    child: Card(
+          ),
+        ),
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : bimbinganList.isEmpty
+              ? const Center(child: Text("Belum ada data bimbingan."))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: bimbinganList.length,
+                  itemBuilder: (context, index) {
+                    final item = bimbinganList[index];
+                    return Card(
                       color: Colors.orange[700],
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: const EdgeInsets.only(bottom: 16),
                       child: Padding(
                         padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildRow("Nama", mahasiswa['nama']!),
-                            _buildRow("NIM", mahasiswa['nim']!),
-                            _buildRow("Prodi", mahasiswa['prodi']!),
-                            _buildRow("Semester", mahasiswa['semester']!),
-                            _buildRow("Dosen Pembimbing", mahasiswa['dosen']!),
+                            buildRow("Nama", item['mahasiswa']['nama']),
+                            buildRow("NIM",
+                                item['mahasiswa']['nim']?.toString() ?? '-'),
+                            buildRow(
+                                "Angkatan",
+                                item['mahasiswa']['angkatan']?.toString() ??
+                                    '-'),
+                            buildRow("Topik", item['topik']),
+                            buildRow("Tanggal", item['tanggal_bimbingan']),
+                            buildRow("Status", item['status']),
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+                    );
+                  },
+                ),
     );
   }
 
-  Widget _buildRow(String title, String value) {
+  Widget buildRow(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title,
-                style: TextStyle(
+            Text(label,
+                style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white)),
-            Text(value, style: TextStyle(fontSize: 14, color: Colors.white)),
+            Text(value,
+                style: const TextStyle(fontSize: 14, color: Colors.white)),
           ],
         ),
-        SizedBox(height: 4),
-        Divider(color: Colors.white, thickness: 1),
+        const SizedBox(height: 4),
+        const Divider(color: Colors.white, thickness: 1),
       ],
     );
   }
