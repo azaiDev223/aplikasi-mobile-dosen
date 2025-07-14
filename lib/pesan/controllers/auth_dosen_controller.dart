@@ -2,7 +2,6 @@ import 'package:aplikasi_dosen/pesan/models/dosen_model.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class AuthDosenController extends GetxController {
   var token = ''.obs;
   var dosen = Rxn<Dosen>(); // ⬅️ inilah getter 'dosen'

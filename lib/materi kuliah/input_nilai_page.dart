@@ -35,7 +35,7 @@ class _MahasiswaNilaiPageState extends State<MahasiswaNilaiPage> {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.131.140:8000/api/input-nilai/mahasiswa/$jadwalId?mata_kuliah_id=${widget.mataKuliahId}'),
+          'http://192.168.112.140:8000/api/input-nilai/mahasiswa/$jadwalId?mata_kuliah_id=${widget.mataKuliahId}'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -69,7 +69,7 @@ class _MahasiswaNilaiPageState extends State<MahasiswaNilaiPage> {
     String? token = prefs.getString('token');
 
     final response = await http.post(
-      Uri.parse('http://192.168.131.140:8000/api/input-nilai/simpan'),
+      Uri.parse('http://192.168.112.140:8000/api/input-nilai/simpan'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -244,7 +244,7 @@ class MahasiswaSudahDinilaiPage extends StatelessWidget {
 
     final response = await http.get(
       Uri.parse(
-          'http://192.168.131.140:8000/api/input-nilai/sudah-dinilai/$jadwalKuliahId?mata_kuliah_id=$mataKuliahId'),
+          'http://192.168.112.140:8000/api/input-nilai/sudah-dinilai/$jadwalKuliahId?mata_kuliah_id=$mataKuliahId'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -310,8 +310,88 @@ class MahasiswaSudahDinilaiPage extends StatelessWidget {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit, color: Colors.grey),
+                    // onPressed: () {
+                    //   // Fitur edit bisa ditambahkan di sini
+                    // },
                     onPressed: () {
-                      // Fitur edit bisa ditambahkan di sini
+                      final nilaiController =
+                          TextEditingController(text: mhs['nilai'].toString());
+                      final gradeController =
+                          TextEditingController(text: mhs['grade'].toString());
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Edit Nilai'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: nilaiController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Nilai'),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
+                              ),
+                              const SizedBox(height: 10),
+                              TextField(
+                                controller: gradeController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Grade'),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Batal'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                final token = prefs.getString('token');
+
+                                final response = await http.post(
+                                  Uri.parse(
+                                      'http://192.168.112.140:8000/api/input-nilai/simpan'),
+                                  headers: {
+                                    'Authorization': 'Bearer $token',
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: json.encode({
+                                    'mahasiswa_id': mhs['id'],
+                                    'semester': mhs['semester'],
+                                    'tahun_akademik': mhs['tahun_akademik'],
+                                    'mata_kuliah_id': mataKuliahId,
+                                    'nilai':
+                                        double.tryParse(nilaiController.text),
+                                    'grade': gradeController.text,
+                                  }),
+                                );
+
+                                if (response.statusCode == 200) {
+                                  Navigator.pop(context, true); // Tutup dialog
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text('Nilai berhasil diperbarui')),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text('Gagal mengupdate nilai')),
+                                  );
+                                }
+                              },
+                              child: const Text('Simpan'),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),

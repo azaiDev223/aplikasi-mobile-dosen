@@ -31,7 +31,7 @@ class _ubahsandiState extends State<ubahsandi> {
     final token = prefs.getString('token');
 
     final response = await http.post(
-      Uri.parse('http://192.168.131.140:8000/api/dosen/update-password'),
+      Uri.parse('http://192.168.112.140:8000/api/dosen/update-password'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',

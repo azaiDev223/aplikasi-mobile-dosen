@@ -23,7 +23,7 @@ class _LoginTwoState extends State<LoginTwo> {
     setState(() => isLoading = true);
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.131.140:8000/api/login-dosen'),
+        Uri.parse('http://192.168.112.140:8000/api/login-dosen'),
         headers: {'Accept': 'application/json'},
         body: {
           'email': cUser.text.trim(),

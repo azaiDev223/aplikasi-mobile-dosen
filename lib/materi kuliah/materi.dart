@@ -26,7 +26,7 @@ class _MatkulListPageState extends State<MatkulListPage> {
     String? token = prefs.getString('token');
 
     final response = await http.get(
-      Uri.parse('http://192.168.131.140:8000/api/input-nilai/matkul'),
+      Uri.parse('http://192.168.112.140:8000/api/input-nilai/matkul'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',

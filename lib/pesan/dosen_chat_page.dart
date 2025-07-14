@@ -96,7 +96,7 @@ class _DosenChatPageState extends State<DosenChatPage> {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://192.168.131.140:8000/api/chat/$messageId'),
+        Uri.parse('http://192.168.112.140:8000/api/chat/$messageId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',

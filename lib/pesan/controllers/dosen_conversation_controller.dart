@@ -3,12 +3,10 @@ import 'package:aplikasi_dosen/pesan/controllers/auth_dosen_controller.dart';
 import 'package:aplikasi_dosen/pesan/models/mahasiswa_model.dart';
 import 'package:get/get.dart';
 
-
-
-
 class DosenConversationController extends GetxController {
   final ApiService _apiService = ApiService();
-  final AuthDosenController _authController = Get.find(); // Pastikan Anda punya controller ini
+  final AuthDosenController _authController =
+      Get.find(); // Pastikan Anda punya controller ini
 
   var conversationList = <Mahasiswa>[].obs;
   var isLoading = true.obs;

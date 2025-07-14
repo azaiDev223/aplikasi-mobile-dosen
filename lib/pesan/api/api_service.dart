@@ -4,7 +4,7 @@ import '../models/mahasiswa_model.dart';
 import '../models/chat_message_model.dart';
 
 class ApiService {
-  final String _baseUrl = "http://192.168.131.140:8000/api"; // Sesuaikan IP Anda
+  final String _baseUrl = "http://192.168.112.140:8000/api"; // Sesuaikan IP Anda
 
   // ... (fungsi login, logout, dll untuk dosen)
 

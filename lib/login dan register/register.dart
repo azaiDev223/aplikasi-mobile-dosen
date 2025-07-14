@@ -35,7 +35,7 @@ class _RegisterState extends State<Register> {
 
   Future<void> fetchProdi() async {
     final res = await http.get(
-      Uri.parse('http://192.168.131.140:8000/api/prodi'),
+      Uri.parse('http://192.168.112.140:8000/api/prodi'),
       headers: {'Accept': 'application/json'},
     );
     if (res.statusCode == 200) {
@@ -61,7 +61,7 @@ class _RegisterState extends State<Register> {
     setState(() => errorMsg = '');
 
     try {
-      var uri = Uri.parse('http://192.168.131.140:8000/api/dosen');
+      var uri = Uri.parse('http://192.168.112.140:8000/api/dosen');
       var request = http.MultipartRequest('POST', uri);
 
       request.fields['nip'] = cNip.text.trim();

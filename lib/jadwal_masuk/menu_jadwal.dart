@@ -1,4 +1,5 @@
 // lib/jadwal_masuk/jadwal_per_hari.dart
+import 'package:aplikasi_dosen/jadwal_masuk/Daftar_mahasiswa.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_dosen/service/jadwal_service.dart';
 
@@ -97,58 +98,71 @@ class _JadwalPerHariState extends State<JadwalPerHari> {
                             final item = jadwal[index];
                             final kelas = item['kelas'];
                             final matkul = kelas['mata_kuliah'];
-                            return Card(
-                              color: Color(0xFFBEE4BE),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 16),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      matkul['kode_matkul'] ?? '',
-                                      style: TextStyle(
-                                        fontFamily: 'Poppinssemibold',
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      kelas['nama_kelas'],
-                                      style: TextStyle(
+                            return InkWell(
+                              onTap: () {
+                                final jadwalId = item['id'];
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DaftarMahasiswaPage(
+                                        jadwalKuliahId: jadwalId),
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                color: Color(0xFFBEE4BE),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 16),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        matkul['kode_matkul'] ?? '',
+                                        style: TextStyle(
                                           fontFamily: 'Poppinssemibold',
-                                          fontSize: 14),
-                                    ),
-                                    Text(
-                                      matkul['nama_matkul'],
-                                      style: TextStyle(
-                                        fontFamily: 'PoppinsBold',
-                                        fontSize: 14,
+                                          fontSize: 16,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "${item['jam_mulai']} - ${item['jam_selesai']}",
-                                          style: TextStyle(
-                                              fontFamily: 'Poppinssemibold',
-                                              fontSize: 14),
+                                      Text(
+                                        kelas['nama_kelas'],
+                                        style: TextStyle(
+                                            fontFamily: 'Poppinssemibold',
+                                            fontSize: 14),
+                                      ),
+                                      Text(
+                                        matkul['nama_matkul'],
+                                        style: TextStyle(
+                                          fontFamily: 'PoppinsBold',
+                                          fontSize: 14,
                                         ),
-                                        Text(
-                                          item['ruangan'],
-                                          style: TextStyle(
-                                              fontFamily: 'Poppinssemibold',
-                                              fontSize: 14),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                      ),
+                                      SizedBox(height: 4),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "${item['jam_mulai']} - ${item['jam_selesai']}",
+                                            style: TextStyle(
+                                                fontFamily: 'Poppinssemibold',
+                                                fontSize: 14),
+                                          ),
+                                          Text(
+                                            item['ruangan'],
+                                            style: TextStyle(
+                                                fontFamily: 'Poppinssemibold',
+                                                fontSize: 14),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

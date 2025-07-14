@@ -20,12 +20,107 @@ class _MahasiswaBimbinganState extends State<MahasiswaBimbingan> {
     fetchBimbingan();
   }
 
+  // edit status
+  Future<void> updateStatus(int bimbinganId, String newStatus) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.put(
+      Uri.parse('http://192.168.112.140:8000/api/bimbingan/$bimbinganId'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'status': newStatus}),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Status berhasil diperbarui")),
+      );
+      fetchBimbingan(); // refresh data
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal mengubah status")),
+      );
+    }
+  }
+
+  void showStatusDialog(int bimbinganId, String currentStatus) {
+    final statusOptions = getStatusOptions(currentStatus);
+
+    if (statusOptions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Status ini tidak bisa diubah.')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        String? selectedStatus = statusOptions.first;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Ubah Status Bimbingan"),
+              content: DropdownButtonFormField<String>(
+                value: selectedStatus,
+                items: statusOptions.map((status) {
+                  return DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedStatus = value!;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Batal"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (selectedStatus != null) {
+                      updateStatus(bimbinganId, selectedStatus!);
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text("Simpan"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  List<String> getStatusOptions(String currentStatus) {
+    switch (currentStatus) {
+      case 'Diajukan':
+        return ['Terjadwal', 'Dibatalkan'];
+      case 'Terjadwal':
+        return ['Selesai', 'Dibatalkan'];
+      default:
+        return []; // Selesai/Dibatalkan tidak bisa diubah
+    }
+  }
+
+  // selesai
+
   Future<void> fetchBimbingan() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     final response = await http.get(
-      Uri.parse('http://192.168.131.140:8000/api/bimbingan-dosen'),
+      Uri.parse('http://192.168.112.140:8000/api/bimbingan-dosen'),
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer $token',
@@ -110,6 +205,19 @@ class _MahasiswaBimbinganState extends State<MahasiswaBimbingan> {
                             buildRow("Topik", item['topik']),
                             buildRow("Tanggal", item['tanggal_bimbingan']),
                             buildRow("Status", item['status']),
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white),
+                                onPressed: () {
+                                  showStatusDialog(item['id'], item['status']);
+                                },
+                                child: const Text("Ubah Status",
+                                    style: TextStyle(color: Colors.black)),
+                              ),
+                            ),
                           ],
                         ),
                       ),

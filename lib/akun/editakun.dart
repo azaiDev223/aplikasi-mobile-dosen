@@ -36,7 +36,7 @@ class _EditAkunState extends State<EditAkun> {
     final token = prefs.getString('token');
 
     final res = await http.get(
-      Uri.parse('http://192.168.131.140:8000/api/dosen/me'),
+      Uri.parse('http://192.168.112.140:8000/api/dosen/me'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -69,7 +69,7 @@ class _EditAkunState extends State<EditAkun> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.131.140:8000/api/dosen/profile/update'),
+      Uri.parse('http://192.168.112.140:8000/api/dosen/profile/update'),
     );
 
     request.headers['Authorization'] = 'Bearer $token';

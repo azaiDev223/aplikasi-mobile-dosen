@@ -9,7 +9,7 @@ Future<List<dynamic>> fetchJadwalDosen() async {
 
   final response = await http.get(
     Uri.parse(
-        'http://192.168.131.140:8000/api/jadwal-dosen'), // ganti URL sesuai servermu
+        'http://192.168.112.140:8000/api/jadwal-dosen'), // ganti URL sesuai servermu
     headers: {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
